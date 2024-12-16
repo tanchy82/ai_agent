@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: ai-agent
+  main:
+    web-application-type: servlet
+ai:
+  alibaba-key: sk-d69ddee1d8424716a563c99100ec3add
