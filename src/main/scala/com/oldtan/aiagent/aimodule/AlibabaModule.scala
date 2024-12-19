@@ -15,24 +15,25 @@ class AlibabaModule {
 
   def callWithMessage(requestMsg: String): String = {
     var responseMsg:String = null
+    def messageBuilders(role: String, content: String): Message.MessageBuilder[_, _] = {
+      val builder = Message.builder()
+      builder.role(role)
+      builder.content(content)
+      builder
+    }
     try {
-      val systemBuilder = Message.builder()
-      systemBuilder.role(Role.SYSTEM.getValue)
-      systemBuilder.content("You are a helpful assistant.")
-
-      val userBuilder = Message.builder()
-      userBuilder.role(Role.USER.getValue)
-      userBuilder.content(requestMsg)
-
       val generationParamBuilder = GenerationParam.builder()
       generationParamBuilder.apiKey(apiKey)
       generationParamBuilder.model("qwen-plus")
-      generationParamBuilder.messages(util.Arrays.asList(systemBuilder.build(), userBuilder.build()))
+      generationParamBuilder.messages(util.Arrays.asList(
+        messageBuilders(Role.SYSTEM.getValue, "You are a helpful assistant.").build(),
+        messageBuilders(Role.USER.getValue, requestMsg).build()))
       generationParamBuilder.resultFormat(GenerationParam.ResultFormat.MESSAGE)
       responseMsg = new Generation().call(generationParamBuilder.build().asInstanceOf[GenerationParam]).getOutput.getChoices.get(0).getMessage.getContent
     }catch {
       case e: Exception =>
-        print(e.getCause)
+        println(e.getMessage, e.getCause)
+        println("请参考文档：https://help.aliyun.com/zh/model-studio/developer-reference/error-code")
         responseMsg = e.getMessage
     }
     responseMsg
